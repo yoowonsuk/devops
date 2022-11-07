@@ -1,0 +1,37 @@
+xyrcwanfqwkegshsqm@tmmcv.com
+rkddkwlrhdiddl
+qwer1234asdf
+
+
+https://bit.ly/3DDpe05
+https://github.com/c1t1d0s7
+
+<변경 할 것>
+https://github.com/c1t1d0s7/test-maven-java-spring-hello-webapp
+
+ssh 키 등록 참고
+https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account
+
+깃
+https://git-scm.com/
+
+Jenkins install dependency
+https://www.jenkins.io/doc/administration/requirements/java/
+
+systemctl status jenkins
+
+sudo zypper install xxxx
+
+build step에 mvn package 적어도 있지만, maven integration 플러그인 사용
+Build에 (mvn) (clean) package
+
+sudo apt list --installed | grep maven
+war -> 와일드플라이 jboss, tomcat
+
+redhat 서비스 자동 실행 x, ubuntu랑 debian은 바로 시작
+
+sudo ss -tnlp | grep 8080
+sudo systemclt restart tomcat9
+
+maven 프로젝트 -> freestyle 기반, 여러 분이 실행하기 위한 명령어를 자유롭게 지정 -> 실무에서 잘 안 쓰임 -> 파이프라인으로
+Jenkins http://3.35.23.26:8080/pipeline-syntax/ 주소 들어가면 검색 가능
