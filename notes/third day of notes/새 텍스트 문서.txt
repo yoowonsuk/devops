@@ -1,0 +1,132 @@
+ecr docker registry dockerhub
+
+실습 3-9에서만 host daemon에서 배포되어야 함
+otherwise dind에서 내부에서 띄움
+image docker:dind 코드는 현재 띄워져 있는 dind랑 다름 그냥 아무이미지 띄운 것
+
+sudo ss -tnlp | grep docker
+systemctl status docker
+ls -l /run/containerd/containerd.sock (소켓통신, not TCP)
+
+jdk 굳이.. jre (runtime만 있으면 되니까)
+
+ExecStart= < 오타 아니고, 지우라는 뜻
+                   아래 내용도 추가해야 함
+
+docker exec -it jenkins-docker bash 들어가서 docker container ls
+
+docker -H tcp://172.31.19.154:2375 container ls : <private IP>임 저거
+--tlsverify=false 안 되네.. insecure daemon.json에다가 적어야함.
+
+docker -H tcp://172.31.19.154:2375 container stop hello-world
+docker -H tcp://172.31.19.154:2375 container rm hello-world
+-> 비효율적 iac 멱등성, ansible 멱등성 있음  즉, 멱등성 없으면 안 좋음..
+
+ansible (ansible works)-> redhat 인수
+(iac 도구)구성 관리 도구(=configuration Management tool): chef puppet saltsack, ansible
+ceph 스토리지 도구
+즉, shell script의 후속이 ansible
+terraform, cloudformation(aws) openstack의 heat -> provisioning 도구  새롭게 배포할 때 사용하는 것
+ex) cloudformation에서 ec2 생성하고 ansible로 웹서비스, app서버, db서버 구축
+provisioning이 lifecycle 관리지만 구성관리도 함, 구성관리도구도 provisioning 도구를 포함함. 경계가 무너지는 추세
+
+software infra platform 뭐든 코드로 하는 추세.. IaC
+docker-compose 이용하면 yaml로 컨테이너 운영 방법도 작성할 수 있음
+
+ansible은 agent가 없음. ssh로 작동함 (윈도우에서 작동하지 않음.)
+-> 다른 puppet 등에서도 agent 없어졌고, windows10이상에서는 ssh도 있고 키면 됨. but ansible에서 윈도우용 안 만든다고 못 박음
+윈도우는 winrm windown remote management
+
+kubernetes azure gcp oracle cloud alibabacloud
+digital ocean -> 네트워크 장비
+
+ppa personal package archive
+운영체제 자체 패키지 버전이 매우 낮음 그래서 redhat에서 따로 저장소 관리 하고 있음
+
+vim inventory.ini
+
+192.168.10.10
+proxyserver ansible_host=192.168.10.11 ansible_user=ubuntu
+
+[webservers]
+web1.example.com
+web2.example.com
+
+[dbservers]
+db1.example.com
+db2.example.com
+
+psrp : powershell remoting protocol
+oc : openshift command line
+aws_ssm 관리노드
+
+sudo -i
+su
+
+sudo cat /etc/sudoers.d/90-cloud-init-users
+ubuntu(사용자) 모든 시스템=(모든사용자로) password없이 모든명령어를 쓸 수 있다. 
+ex) ubuntu ALL=(ALL) NOPASSWD:ALL
+
+
+도커 연결 방식
+/run/containered/containered.sock < 지금 방식
+/var/run/docker.sock < 전통적인 방식
+
+ping (SFTP로, ssh의 기능임) ICMP가 아님. (윈도우는 ICMP가 막혀있음)
+
+모듈 -state에 present과 absent을 주로 씀
+present (있어야 한다) absent(없어야 한다)
+멱등성 f(f(x))= f(x) 몇 번 실행 하든 한 번 실행하는 것과 같아야 한다
+
+ping, apt, service 모듈 살펴봤음
+service는 멀티 플랫폼 지원
+BSD 계열 init, 유닉스 openRC, 전통적 unix 계열 SysV, solaris SMF, 리눅스 systemd, 옛날 리눅스 upstart
+(즉 debian, redhat, suse, 솔라리스 라든지)
+
+started 시작되어야 한다
+restarted 멱등성x 항상 재시작, reload
+
+ssh -f 위치 -N '' passphrase x
+curl http://<WEBSERVER_PUBLIC_IP> -I
+
+sudo grep ubuntu /etc/shadow -> password 없음 ! 잠겨져있음
+                                           -> ubuntu:!:19305:0:99999:7:::
+sudo passwd ubuntu
+ip a s
+명령어 && 명령어
+
+ansible webserver -i hosts.ini -m ping
+ansible webserver -i hosts.ini -m ping -a 'data=hello' -k (password 물어봄, return hello)
+vim authorized_keys에 있음 키 값은... (password는 ubuntu 비밀번호임 authorized_keys는 ssh-keygen)
+state=absent autoremove=true     (purge=true 도 되는 듯?)   디펜더시도 다 지우기
+
+ansible webserver -i hosts.ini -m service -a  'name=apache2 state=started enabled=true' -b
+ansible -> 멱등성!! 때문에 사용
+
+204쪽ansible webserver -i hosts.ini -m command -a 'hostname'
+free_form : 자유양식임 -> shell, raw, command 모두 가지고 있는 parameter임
+changed 상태로 보고함;; 멱등성 제공 안 함
+(script는 별개임)
+docker exec(쉘 아님), shell 처럼
+<command> shell 사용 안 함    (shell에는 환경변수, alias, pipe | , redirection 기능이 있음)
+
+ansible webserver -i hosts.ini -m XXX -a 'ps -ef | grep apache2'
+shell 가능 ps -ef | grep apache2
+command 불가능 
+
+기본적으로 SFTP로 모듈 복사 후 실행 후 삭제
+raw는 복사 없이 명령어 던짐 (ssh ip hostname) 이거랑 똑같음. 그래서 python 모듈도 필요 없음 ex) cisco 같은 네트워크 legacy 때문에
+cisco는 ios 장비. ssh만 있음 unix라서.. python없고 shell도 없음(shell 개념은 있는데 bash shell이 아님)
+
+cat /etc/apache2/ports.conf  < 그냥 따라써봄
+
+setup module - 맨 처음에 실행하는 많은 변수(환경변수)값들 읽어옴, remote것.. 그래서 ubuntu 면 apt centos면 yum 이런 설정 가능함
+fact 변수라고 함 (Gathering Facts)
+gather
+
+recap 요약
+rescued (try catch 예외)
+
+ssh-copy-id 자기 자신한테도.. authorized_keys에 넣어야 하나봄
+
+-vvvv debugging mode

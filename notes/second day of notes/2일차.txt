@@ -1,0 +1,85 @@
+sudo useradd jenkins -d /var/lib/jenkins -m -s /bin/bash
+homediretory -d, bash shell -s
+
+<hypervisor 기반 가상화> -> 서버 가상화 (하드웨어 가상화) ubuntu 1gb, windows 10gb 대략..
+ec2 인스턴스
+리눅스 KVM
+VMware v스피어
+esxi
+redhat vertualization
+MS hyperV
+시트릭스 xenserver
+
+<os 레벨 가상화>
+container ex) docker, cri-o -> container runtime이라고 부름
+
+보통 VM위에 컨테이너 올림 (물리시스템에 container 올릴 수 있음, but 리소스 효율성 고려해서 이렇게 함)
+둘 다 분리시키기 위한 장치임 (hypervisor, container(docker)) Isolation
+
+Docker는 LXC 사용, LXC를 사용할 수 있도록 API를 만든 게 docker
+LXC는 runC 표준으로 바뀜. oci (open container initiative) -> container의 표준 interface
+
+저수준 표준 runC, 고수준 표준 containerd 통일시킴
+podman는  cri-o 회사? 소프트웨어꺼다
+
+chroot root directory 변경
+dr disaster recovery -> infrastructre as code
+
+docker-ce는 server
+docker-ce-cli는 client
+containered.io 고수준 runtime
+systemctl status docker
+docker ps 안 됨, 권한 관련 된 건 재시작 필요
+
+httpd : 아파치의 공식 이미지
+mysql: DB
+
+apache, nginx, mysql, mariaDB, postgresql, redis
+ps -ef | grep httpd 단 격리구조 가짐.. 아무리 해당 운영체제 터미널에서 쳐서 나오더라도
+
+docker container stats containernameorID --no-stream
+
+sudo -i
+cd /var/lib/docker/containers/ 안에 id고, 그 안에 json.log   로그 경로
+
+exec는 디버깅 주로..
+
+docker container run -d mysql -> 볼륨 생김
+docker network/volume inspect
+docker container run -d -e MYSQL_ROOT_PASSWORD=P@assw0rd mysql
+docker container run -d -v ${volume name}:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=P@ssw0rd mysql
+
+wordpress: CMS 도구 (contents management system) 웹 구현 도구
+php로 만들어져있음, apache, nginx 웹서버에 올릴 수 있고 mysql mariadb 중 사용함
+
+mysql, wordpress 할 때 password 바꿔야하고, volume 지워야 함
+
+debian ubuntu redhat centos rockylinux opensuse
+busybox : linux 배포한 embedding 용 10MB 미만, 패키지 관리자 없음  ex) ubuntu debian apt라든지 centos yum or dnf가 없음
+alpinelinux : busybox를 base로 해서 apk 패키지 관리자를 넣음
+
+nmask sha256:8c353 < tag 대신 digest로 이미지 검색
+go -> static build, 1개 파일이 떨어짐 빌드하면..
+scratch image를 쓰면 이미지 없이 빌드 가능 FROM SCRATCH
+
+-----------------------------------------------
+git clone 
+sudo apt install maven
+mvn --version
+mvn package
+
+FROM tomcat:9-jdk8
+COPY target/hello-world.war /usr/local/tomcat/webapps/
+docker image build -t myweb:v1 .
+-----------------------------------------------
+docker container run -d -p 8080:8080 myweb:v1
+IP:8080/hello-world
+
+docker image tag myhello 아이디/myhello
+docker image push 아이디/myhello
+
+curl http://~~ 끝에 / 넣기
+
+jenkins 이미지는 더이상x
+jenkins/jenkins
+jenkins/agent , 도커 에이전트가 들어있음 이 이미지가 제공해준다

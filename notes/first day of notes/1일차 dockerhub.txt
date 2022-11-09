@@ -22,13 +22,13 @@ systemctl status jenkins
 
 sudo zypper install xxxx
 
-build step에 mvn package 적어도 있지만, maven integration 플러그인 사용
+build step에 Execute shell에 mvn package 적어도 되지만, maven integration 플러그인 사용
 Build에 (mvn) (clean) package
 
 sudo apt list --installed | grep maven
-war -> 와일드플라이 jboss, tomcat
+war -> 와일드플라이 jboss, tomcat 배포 가능
 
-redhat 서비스 자동 실행 x, ubuntu랑 debian은 바로 시작
+설치하면 redhat 서비스 자동 실행 x, ubuntu랑 debian은 바로 시작
 
 sudo ss -tnlp | grep 8080
 sudo systemclt restart tomcat9
