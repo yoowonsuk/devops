@@ -1,0 +1,124 @@
+helm repostiory는 주로 http 기반 -> github 가능
+helm charts = package
+tiller는 pod고, helm client v2 용
+-> tiller는 외부 노출 but 모든 권한 가져야 api server에 요청가능. 그래서 없어짐
+
+hub.helm.sh 헬름 저장소 서비스 like dockerhub (지금 운영 안 함)
+
+helm 사전 사항
+kubectl 명령은 필요 없지만 구성 (~/.kube/config)는 필요함
+-> Contexts는 cluster랑 user 묶어놓은 것
+-> cluster는 x.509 pki CA 구조
+
+go는 static binary를 default로 만듦 (명령어가 하나 뿐.. 라이브러리가 파일에 다 포함되어 있어서)
+
+기본 chart 구조 (bitnami 차트 저장소)
+https://github.com/bitnami/charts
+VMware의 자회사 devops쪽 하는 회사
+
+Chart.yaml(meta data): dependency의 name은 의존성 패키지  (일반적으로 common)
+templates: kubernetes object 파일  => {{ }} parameter -> values.yaml
+mysql 고가용성 구성 - primary => clustering 구성 가능
+
+아티펙트 허브 -> 저장소라기보다 검색 (저장소는 github)
+
+helm install (name) (chart)
+(name)은 내가 정함
+(chart)는 repo add에서 사용한 이름 (이것도 add 당시 내가 정할 수 있음)
+
+redirection 으로 파일로 저장 : 쉘 명령어 or 기능
+
+_helpers.tpl : 사용자에게 사용법 출력
+md : markdown 파일
+
+pipeline-stage-view: log에서 순서대로 success fail 나오는 그거 보는거임
+jenkins 노드관리
+Name: Kubernetes
+Kubernetes URL: https://kubernetes.default (= https://kubernetes.default.svc.cluser.local)
+kubectl get svc -> kubernetes 서비스 존재 (api server) default namespace의 쿠버네티스
+
+sleep infinity -> jenkins가 나중에 stop rm 함
+
+kaniko -> docker cli, daemon 없어도 이미지 빌드 가능
+CRI-O => podman(cr, docker 대체제) + buildah(도커빌드) + skopeo(원격저장소관리)
+
+buildah는 container registry push 없는 듯
+kaniko -> container regsitry push도 존재 -> google gcp pipeline에서 이미지 빌드에 쓰임
+
+gcr.io/kaniko-project/executor:debug (not latest)
+gs: google (object) storage
+
+예시  context=dir://$WORKSPACE --destination=c1t1d0s7/hello-world:$BUILD_NUMBER --destination=c1t1d0s7/hello-world:latest
+
+<Argo 시작>
+aws/codepipeline : 쿠버네티스에 deploy 기능만 없음, dockerimage 빌드 푸쉬, Java빌드 checkout 있는데...
+ec2, ecs(container) deploy도 있는데...
+
+eksctl만든 weaveworks
+SSOT 깃에 올린 single source가 신뢰 가능한 단일 소스다
+
+argo에서 application이 kube 배포할 그런 것들을 일컬음
+저장소 서비스: git에서 땡겨온 임시? 암튼 로컬에 있는 거
+
+kubectl edit -n argo svc argocd-server
+
+DinD container가 host 모든 권한 필요 --previledged
+Argo -> kube-apiserver랑 다름
+
+git branch -M main
+
+jenkins주소/restart
+
+staging, production
+HPA 리소스 (autoscaling) 를 위해 metric server 필요함 (실시간 cpu, memory)
+https://github.com/kubernetes-sigs/metrics-server
+kubectl top nodes
+kubectl top pods
+cpu 1000m = 1코어
+
+prometheus server
+TSDB: time series db (시계열 데이터 베이스)
+retrieval 가져옴 (pull 방식) agent가 보내주는 push가 아니라서 service discovery에서 정보를 가져와야 함
+HTTP Server 인증이 없어서 테스트, 개발용, not 모니터링
+Grafana: data visualization and export  진정한 모니터링
+
+prometheus HA 구성 안 됨 (서버장애 ㅠ)
+storage 저장이라 longterm 힘듦 (query 속도 문제도 있어서 최대 한 달 밖에 못 씀)
+-> Datadog 같은 걸로 씀
+-> cncf landscape 에서 cortex, thanos(더 자주 씀)가 HA 클러스팅해줌
+
+1. jenkins plugin prometheus metrics
+2. jenkins restart
+3. jenkins URL:8080/prometheus
+4. prometheus -> dashboard -> import -> 9964 -> 맨 아래 Prometheus Data Source 제대로 클릭 -> import
+-> https://grafana.com/grafana/dashboards/
+https://bit.ly/3DDpe05
+
+kubectl get --raw /metrics 쿠버네티스에서 프로메테우스가 가져가는 곳
+
+jenkins.jenkins.svc.cluster.local:8080/prometheus
+서비스.namespace.svc.cluster.local
+
+ELK: 듀얼라이센스 정책
+elastic kibana logstash: 자바
+Fluentd(데이터 가공): C언어
+fluentbit(데이터 수집 정도)
+logstash -> beats로 경량화
+
+production cpu 4 memory 8이 일반적
+elastic 회사가 인증을 subscription해야 기능 제공함
+
+노드그룹명 확인
+eksctl get nodegroup --cluster myeks
+eksctl scale nodegroup --cluster myeks --name <GROUP> -N <NUM>
+
+강사님 on premise로 k8s 구성하고 싶은데 Rancher 쓰는게 좋을까요?
+간단 테스트 = minikube
+프로덕션  = kubespray -> ansible 사용함
+
+sgjang@nobreak.co.kr
+https://youtu.be/gYhv3AlQiaQ
+https://youtu.be/CB2C3gqWows
+https://youtu.be/xO3QTYpdbGA
+https://youtu.be/YVGnpEM-f6I
+5일차: https://www.youtube.com/watch?v=k9nNHlBYvw0

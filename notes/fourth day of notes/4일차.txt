@@ -1,0 +1,119 @@
+adduser -u 1000 jenkins jenkins -D
+uid 1000 jenkins(사용자) jenkins(그룹) -D
+ENTRYPOINT [] 기존 entrypoint 삭제
+CMD ["sh"] DIND에는 bash shell 없음 기본 shell로
+-u 0:0 관리자권한(root)
+
+lookup (ansible 함수)
+BUIILD_NUMBER 대신 TAG_NAME 등 가능
+
+도커스웜이 쿠버네티스에 대항하여 나왔지만, 이후에 나온 것임.
+https://www.youtube.com/watch?v=BE77h7dmoQU
+https://www.youtube.com/watch?v=318elIq37PE
+honeypot 채용사이트
+
+i18n internationalization
+l10n localization
+
+container runtime interface CRI 컨테이너 실행
+CNI container network interface -> overlay 네트워크(tunneling된 네트워크)
+CSI container storage interface -> volume 제공
+
+OCI 표준 -> 이식성 -> aws gcp 네이버 oracle microsft 클라우드에 제공
+ec2 instance에 설치도 할 수 있음
+설치형(jenkins 처럼 kubernetes 직접 설치) or 관리형(SAAS PAAS)
+addon 외부기능
+/var/run /var/log 밑에 로그 but 컨테이너 삭제시 없어짐
+heapster 모니터링 도구가 있었는데, kubernetes 자체 시스템, but 없어짐 -> 프로메테우스가 있어서... (sound cloud가 만듦)
+
+split brain 짝수x 정확히 절반으로 나눠지면 어떤 게 available인지 알 수 없음. voting.
+
+controller manager (cm)4개: node controller, replication controller, endpoint controller(cotainer의 네트워킹 정책 관리), serviceaccount&token controller
+
+Node에는 container runtime이 각자 존재(kublet, k-porxy 외에도)... CR은 cri interface 가짐
+기본적으로 쿠베 노드에는 CR로 도커를 사용중
+-> containerd, cri-o, cri-o의 표준인 podman 등 CR을 사용할 수 있음. docker는 안 됨 (왜냐하면 docker는 이미 containered를 사용중)
+-> 뭔소리지;; 여기까지만 판단하기!
+
+kubelet이 container runtime을 제어하는 agent, (apiserver -> kubelet -> CR 명령 흐름)
+iptables (mapfilter) -> k-proxy가 세팅담당
+
+kubelet은 컨테이너가 아님. 서비스임 (kind 서비스가 아니라 리눅스 service 말하는 듯)
+AWS EKS, google GKE, 아마존 AKS, 오라클 OKE 가 관리형 쿠버네티스 -> control plane 숨겨져 있음. cloud vender가 관리
+
+ELK EFK 로그
+
+IAM (identiy and access management): aws에 인증하기 위한 사용자 계정 정책 등 작업하는 서비스
+MAC brew: https://brew.sh/index_ko
+windows choco: https://chocolatey.org/install
+
+aws s3 ls : s3 bucket 을 확인하는 명령어
+eksctl version
+AWS웹에서 eks 검색해서 설치할 수도 있음 (근데 복잡해서 명령어로 한 것임ㅠ 인증, role 등 세팅해야 될 게 너무 많음)
+-> eksctl.io (by weaveworks 회사)
+
+https://kubernetes.io/ko/docs/tasks/tools/install-kubectl-linux/
+
+chocolatey 홈페이지에서 kubernetes 검색해서 할 수도 있긴 함
+choco install kubernetes-cli --version=1.23.13
+* brew는 버전 선택이 안 됨
+
+eksctl create cluster --name myeks --region ap-northeast-2 --version 1.23 --instance-types t3.medium
+worker node 2 개 생김
+
+1.23부터는 이걸 필수로 설치해야 함
+EBS : block storage
+CSI : container storage interface
+
+kubectl cluster-info
+kubectl get nodes
+ROLES - control node or master 라고 적혀있음(control plane)
+
+<aws 웹>
+EKS에 클러스터 보임
+<인스턴스>
+1. EBS 볼륨 elastic block store
+2. auto sacling 그룹 < loadbalancer
+<기타>
+3. vpc 검색 virtual private cloud -> vpc 서브넷 라우팅 테이블
+4. cloudformation 검색 - provisioning 도구 eksctl 명령어는 stack을 만듦 (iac도구)
+
+데몬셋, 잡/크론잡 -> 배치작업
+서비스: L4, ingress:L7
+
+pvc: pv claim
+
+github container registry = ghcr.io
+-o yaml
+-o wide
+--port 80: 프록시 포트
+
+service에 kubernetes는 apiserver
+
+metallb, openelb 사용하면 load balancer처럼 쓸 수 있음 (bgp routing 가능한 라우터가 있으면 proxy처럼 사용 가능)
+VMware, f5(?)도 외부용 프록시 구성 가능(온프레미스용)
+storageclass rook ceph, gp2(아마존꺼임, 로컬 구성 불가능)
+
+1023이하 포트 관리자권한필요
+RBAC 역할 기반 접근 제어, namespace에 따라 사용자 접근 제어 가능
+
+docker에 cgroup (리눅스 커널 기능), namespace랑 kubernetes namespace랑 다름
+
+레플리카셋은 복제수만 조정가능, 이미지는 deployment로 써야.. (replicaset을 새로 만듦, 기존 RS 삭제)
+k8s recreate, rampled(rolling update) 만 지원
+blue/grenn, canary, A/B testing 하려면 별도의 proxy addon붙여야 ex) traffic
+
+주석
+annotations:
+  kubernetes.io/change-cause: "go-myweb from v3 to v4"
+
+Round robin, list connection 스케줄 한 종류인듯
+DNS에 search 명령어는 검색하는 곳
+
+kubectl에서 --rm은 파드 죽으면 terminated 하라는 뜻
+host 명령어: DNS 쿼리 (dig도 있음)
+
+nginx haproxy traffic -> 클라우드 안 쓰면 외부 proxy 만들기
+helm 쿠버네티스 패키지 관리자
+
+metallb, openelb -> 파드형태 or bgp 라우터.. 전자는 node 부하 커서 후자는 production레벨까지 가능하다고
